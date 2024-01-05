@@ -1,5 +1,5 @@
-from django.urls import path
+# from django.urls import path
  
-websocket_urlpatterns = [
+# websocket_urlpatterns = [
  
-]
+# ]
