@@ -5,7 +5,7 @@ from pathlib import Path
 import api.routing
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
- 
+from api.middleware import TokenAuthMiddleware
 # This allows easy placement of apps within the interior
  
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -20,7 +20,7 @@ django_application = get_asgi_application()
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
-        "websocket": URLRouter(api.routing.websocket_urlpatterns),
+        "websocket": TokenAuthMiddleware(URLRouter(api.routing.websocket_urlpatterns)),
     }
 )
 

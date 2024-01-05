@@ -13,12 +13,15 @@ class ChatConsumer(JsonWebsocketConsumer):
         self.room_name = None
  
     def connect(self):
+        self.user = self.scope["user"]
+        if not self.user.is_authenticated:
+            return
         print("Connected!")
         self.room_name = "home"
         self.accept()
         async_to_sync(self.channel_layer.group_add)(
-        self.room_name,
-        self.channel_name,
+            self.room_name,
+            self.channel_name,
         )
         self.send_json(
             {
@@ -31,7 +34,7 @@ class ChatConsumer(JsonWebsocketConsumer):
         print("Disconnected!")
         return super().disconnect(code)
  
- 
+
     def receive_json(self, content, **kwargs):
         message_type = content["type"]
         if message_type == "chat_message":
@@ -45,23 +48,6 @@ class ChatConsumer(JsonWebsocketConsumer):
             )
         return super().receive_json(content, **kwargs)
 
-
-# ==============================
-
-# import json
-
-# from channels.generic.websocket import WebsocketConsumer
-
-
-# class ChatConsumer(WebsocketConsumer):
-#     def connect(self):
-#         self.accept()
-
-#     def disconnect(self, close_code):
-#         pass
-
-#     def receive(self, text_data):
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json["message"]
-
-#         self.send(text_data=json.dumps({"message": message}))
+    def chat_message_echo(self, event):
+        print(event)
+        self.send_json(event)
